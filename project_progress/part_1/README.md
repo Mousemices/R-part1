@@ -31,7 +31,7 @@ Discount is more concentrated around 45-65%, smaller or higher discounts.
 
 Average rating are concentrated mainly between 3 and 4.5, there is a peak point near 4.0. Lower ratings are not frequent compared to Higher ratings.
 
-![top 10 most frequent tokens](1.2.3_price_discount_ratings)
+![top 10 most frequent tokens](1.2.3_prices_discounts_ratings.png)
 
 ## Categories, Brands and Sellers
 
