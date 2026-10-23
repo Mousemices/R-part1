@@ -1,3 +1,17 @@
+# Requirement:
+- python >= 3.9
+
+Run the code cell directly on local machine. 
+
+Create .venv enviroment if needed. 
+Creation and activation:
+ - python3.13 -m venv .venv
+ - source .venv/bin/activate
+
+Deactivation:
+ - deactivate 
+
+
 # Exploratory Data Analysis
 
 A dataset of 28080 records.
