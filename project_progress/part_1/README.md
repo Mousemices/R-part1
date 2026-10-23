@@ -46,6 +46,8 @@ On the other hand, brand and seller are more balanced. At brand side, ecko unl h
 ## Stock availability
 
 This static dataset contains 26,436 in-stock products and 1,644 out-of-stock products.
+![stock availability tabular](1.2.5_out_of_stock_tabular.png)
+![stock availability plot](1.2.5_out_of_stock_plot.png)
 
 # Use of AI
 ChatGPT was used to explain Python concepts, functions, modules, assist with preprocessing and analysis code, issues and bugs. 
