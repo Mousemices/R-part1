@@ -49,8 +49,8 @@ This folder contains our solution for Part 2 of the IRWA Final Project.
 | 1.3 Test queries | The five test queries and their number of results | `test_queries` |
 | 1.4 TF-IDF ranking | Ranks the AND results by cosine similarity of TF-IDF vectors | `TF`, `IDF`, `TFxIDF`, `query_vector`, `cosine_similarity`, `search_tfidf`, `show_top` |
 | 2.1 Metrics | P@K, R@K, AP@K, F1@K, MAP, MRR, NDCG@K | `precision_at_k`, `recall_at_k`, `avg_precision_at_k`, `f1_at_k`, `map_at_k`, `mrr_at_k`, `ndcg_at_k`, `evaluate_query` |
-| 2.2 Validation queries | Applies the metrics to `validation_labels.csv` (query 1 and query 2) | |
-| 2.3 Test queries evaluation | Applies the metrics to our labels in `custom_query_labels.csv` | |
+| 2.2 Validation queries | Evaluates the search engine based on two test queries by our metrics, based on `validation_labels.csv` | `validate_query` |
+| 2.3 Test queries evaluation | Evaluates five test queries using manually assigned relevance labels stored `custom_query_labels.csv` | `validate_manuall_labels` |
 
 ## Trying other queries and options
 
@@ -66,7 +66,13 @@ This folder contains our solution for Part 2 of the IRWA Final Project.
 
 ## Relevance labels file
 
-`custom_query_labels.csv` has one row per judged product: `query_id`, `query`, `pid`, `rank` (position in our ranking), `title`, `description`, `product_details`, `score` (cosine similarity) and `labels` (1 = relevant, 0 = not relevant).
+`custom_query_labels.csv` has one row per judged product: `query_id`, `query`, `pid`, `rank` (position in our ranking), `title`, `description`, `product_details`, `score` (cosine similarity) and `labels` (manually assigned labels: 1 = relevant, 0 = not relevant).
+
+## How the evaluation works
+
+We first evaluate the search engine using the provided `validation_labels.csv`, then perform our own evaluation with five test queries. For each query, we retrieve up to 20 products using AND search and TF-IDF ranking, manually assign relevance labels (1 = relevant, 0 = not relevant), and store them in `custom_query_labels.csv`. We then calculate P@10 (accuracy of the top results), R@10 (coverage of known relevant products), F1@10 (balance between precision and recall), AP@10 and MAP@10 (ranking quality), RR@10 and MRR@10 (position of the first relevant result), and NDCG@10 (ranking quality with higher importance given to top positions).
+
+All five queries achieved P@10, AP@10, RR@10, and NDCG@10 of 1.0, while R@10 ranged from 0.500 to 0.526. These results indicate high precision, but recall is limited to our manually judged pool rather than the entire dataset. The main limitations of the current system are strict AND matching, which may exclude relevant products, TF-IDF ranking without field-specific weights, and limited handling of synonyms and structured product attributes. Possible improvements include OR-based retrieval, BM25 or field-weighted ranking, query expansion, and separate indexes for attributes such as color, gender, and material.
 
 ## Use of AI
 
