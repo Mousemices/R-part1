@@ -6,7 +6,7 @@ This folder contains our solution for Part 2 of the IRWA Final Project.
 |---|---|
 | `02_indexing_evaluation.ipynb` | Code: inverted index, AND search, TF-IDF ranking and evaluation metrics |
 | `custom_query_labels.csv` | Our relevance judgements (0/1) for the five test queries |
-| `IRWA-2026-uXXXXXX-uXXXXXX-uXXXXXX-part-2.pdf` | Report (also uploaded to Aula Global) |
+| `IRWA-2026-u214405-u255290-part-2.pdf` | Report (also uploaded to Aula Global) |
 
 ## Requirements
 
@@ -50,7 +50,8 @@ This folder contains our solution for Part 2 of the IRWA Final Project.
 | 1.4 TF-IDF ranking | Ranks the AND results by cosine similarity of TF-IDF vectors | `TF`, `IDF`, `TFxIDF`, `query_vector`, `cosine_similarity`, `search_tfidf`, `show_top` |
 | 2.1 Metrics | P@K, R@K, AP@K, F1@K, MAP, MRR, NDCG@K | `precision_at_k`, `recall_at_k`, `avg_precision_at_k`, `f1_at_k`, `map_at_k`, `mrr_at_k`, `ndcg_at_k`, `evaluate_query` |
 | 2.2 Validation queries | Evaluates the search engine based on two test queries by our metrics, based on `validation_labels.csv` | `validate_query` |
-| 2.3 Test queries evaluation | Evaluates five test queries using manually assigned relevance labels stored `custom_query_labels.csv` | `validate_manuall_labels` |
+| 2.3 Test queries evaluation | Evaluates five test queries using manually assigned relevance labels stored `custom_query_labels.csv` | `evaluate_manual_labels` |
+| 2.4 Diagnostics | Evidence for the analysis: validation top-10 with labels, relevant products lost by the AND search, near-duplicates, noisy vocabulary, matched fields, query formulation | `labelled_top_k`, `judged_ranking`, `missed_relevant`, `duplicates_in_top_k`, `term_fields_in_top_k`, `gender_leak`, `near_misses` |
 
 ## Trying other queries and options
 

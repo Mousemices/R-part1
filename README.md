@@ -1,4 +1,4 @@
-# Information Retrieval and Web Analytics (IRWA) - Final Project template
+# IRWA Final Project 2026 — Fashion Products Search Engine
 
 <table>
   <tr>
@@ -6,132 +6,150 @@
       <img src="static/image.png" alt="Project Logo"/>
     </td>
     <td style="vertical-align: top;">
-      This repository contains the template code for the IRWA Final Project - Search Engine with Web Analytics.
-      The project is implemented using Python and the Flask web framework. It includes a simple web application that allows users to search through a collection of documents and view analytics about their searches.
+      Search engine (and, in the last part, a RAG system with web analytics) over the fashion products dataset,
+      built for the course <i>Recuperació de la Informació i Anàlisi de la Web</i> (UPF, 2026-27).
+      It is implemented in Python; Part 4 uses the Flask web framework.
+      <br><br>
+      Group: u214405, u255290
     </td>
   </tr>
 </table>
 
 ----
-## Project Structure
+## Project status
 
-```
-/irwa-search-engine
-├── myapp                # Contains the main application logic
-├── templates            # Contains HTML templates for the Flask application
-├── static               # Contains static assets (images, CSS, JavaScript)
-├── data                 # Contains the dataset file (fashion_products_dataset.json)
-├── project_progress     # Contains your solutions for Parts 1, 2, and 3 of the project
-├── .env                 # Environment variables for configuration (e.g., API keys)
-├── .gitignore           # Specifies files and directories to be ignored by Git
-├── LICENSE              # License information for the project
-├── requirements.txt     # Lists Python package dependencies
-├── web_app.py           # Main Flask application
-└── README.md            # Project documentation and usage instructions
-```
+| Part | Topic | Folder | Git tag |
+|---|---|---|---|
+| 1 | Text processing and exploratory data analysis | `project_progress/part_1/` | `IRWA-2026-part-1` |
+| 2 | Indexing and evaluation | `project_progress/part_2/` | `IRWA-2026-part-2` |
+| 3 | Ranking and filtering | — | — |
+| 4 | RAG, user interface and web analytics | — | — |
 
+Each part folder contains the `.ipynb` notebook with the code, the `.pdf` report and its own `README.md`
+with the details of that part.
 
 ----
-## To download this repo locally
+## Project structure
 
-Open a terminal console and execute:
 ```
+/
+├── data                 # Dataset files (not committed, see "Data" below)
+│   ├── fashion_products_dataset.json
+│   └── validation_labels.csv
+├── project_progress     # Our solutions for Parts 1, 2 and 3
+│   ├── part_1           # Preprocessing + EDA notebook and report
+│   └── part_2           # 02_indexing_evaluation.ipynb, custom_query_labels.csv and report
+├── myapp                # Main application logic (Part 4)
+├── templates            # HTML templates for the Flask application (Part 4)
+├── static               # Static assets (images, CSS, JavaScript)
+├── .env                 # Environment variables (e.g. API keys) — never commit it
+├── requirements.txt     # Python package dependencies
+├── web_app.py           # Main Flask application (Part 4)
+└── README.md            # This file
+```
+
+----
+## Setup (only the first time)
+
+### 1. Clone the repository
+
+```bash
 cd <your preferred projects root directory>
-git clone https://github.com/trokhymovych/irwa-search-engine.git
+git clone https://github.com/Mousemices/R-part1.git
+cd R-part1
 ```
 
-## Setting up the Python environment (only for the first time you run the project)
-### Install virtualenv
-Setting up a virtualenv is recommended to isolate the project dependencies from other Python projects on your machine.
-It allows you to manage packages on a per-project basis, avoiding potential conflicts between different projects.
+### 2. Create and activate a virtual environment
 
-In the project root directory execute:
+In the project root:
+
 ```bash
 pip3 install virtualenv
-virtualenv --version
-```
-
-### Prepare virtualenv for the project
-In the root of the project folder run to create a virtualenv named `irwa_venv`:
-```bash
 virtualenv irwa_venv
 ```
 
-If you list the contents of the project root directory, you will see that it has created a new folder named `irwa_venv` that contains the virtualenv:
+Activate it:
+
 ```bash
-ls -l
+source irwa_venv/bin/activate        # Linux / macOS
+irwa_venv\Scripts\activate.bat       # Windows (cmd)
+irwa_venv\Scripts\Activate.ps1       # Windows (PowerShell)
 ```
 
-The next step is to activate your new virtualenv for the project:
-```bash
-source irwa_venv/bin/activate
-```
+You should see `(irwa_venv)` in the terminal prompt.
 
-or for Windows...
-```cmd
-irwa_venv\Scripts\activate.bat
-```
+### 3. Install the dependencies
 
-This will load the python virtualenv for the project.
-
-### Installing Flask and other packages in your virtualenv
-Make sure you are in the root of the project folder and that your virtualenv is activated (you should see `(irwa_venv)` in your terminal prompt).
-And then install all the packages listed in `requirements.txt` with:
 ```bash
 pip install -r requirements.txt
+pip install nltk pandas numpy matplotlib jupyter   # packages used by the Part 1 and Part 2 notebooks
 ```
 
-If you need to add more packages in the future, you can install them with pip and then update `requirements.txt` with:
+The NLTK stop-word list is downloaded automatically the first time the notebooks run.
+
+### 4. Data
+
+Put `fashion_products_dataset.json` and `validation_labels.csv` (provided by the instructor) in the `data/`
+folder at the repository root. The notebooks look for them there.
+
+----
+## How to run Part 2 (Indexing and Evaluation)
+
 ```bash
-pip freeze > requirements.txt
+cd project_progress/part_2
+jupyter notebook 02_indexing_evaluation.ipynb
 ```
 
-Enjoy!
+Run all the cells in order (*Kernel → Restart & Run All*). The notebook must be started from
+`project_progress/part_2/`, because it finds the data with `Path.cwd().parent.parent / "data"`.
 
+What the notebook does, section by section:
 
-## Starting the Web App
+1. **Section 0** — loads the dataset and preprocesses title, description and product details
+   (lowercase, alphanumeric tokens, stop-word removal, Porter stemming), the same as in Part 1.
+2. **Sections 1.1–1.2** — builds the inverted index (`create_index`) and answers conjunctive (AND) queries (`search_and`).
+3. **Section 1.3** — the 5 test queries and Figure 1 (`1.3_top_title_terms.png`).
+4. **Section 1.4** — TF-IDF weights and cosine-similarity ranking (`search_tfidf`, `show_top`).
+5. **Section 2.1** — evaluation metrics: P@K, R@K, AP@K, F1@K, MAP, MRR and NDCG@K.
+6. **Section 2.2** — metrics on `validation_labels.csv` and Figure 4 (`2.2_precision_recall_at_k.png`).
+7. **Section 2.3** — metrics on our manual labels (`custom_query_labels.csv`).
+8. **Section 2.4** — diagnostic cells used for the analysis of the results and of the limitations in the report.
+
+### Options you can change
+
+| Where | Variable / function | Effect |
+|---|---|---|
+| Section 1.3 | `test_queries` | the queries that are searched and evaluated |
+| Section 1.4 | `show_top(query, k=10)` | search any query and show the top-k results |
+| Sections 2.2 / 2.3 | `K` | cut-off used by every metric (default 10) |
+| Section 2.3 | `POOL_SIZE` | how many results per query are exported for manual labelling (default 20) |
+
+To search your own query after running the notebook:
+
+```python
+show_top("women black kurta", k=10)
+```
+
+`custom_query_labels.csv` is never overwritten: the labelling cell only creates it if it does not exist.
+
+----
+## Starting the web app (Part 4)
+
+Before starting it, add your Groq API key (free version available at [groq.com](https://groq.com/)) and any other
+configuration to the `.env` file. **Do not share or commit `.env`**: it contains secrets and is listed in `.gitignore`.
+
+From the project root, with the virtual environment activated:
+
 ```bash
-python -V
-# Make sure we use Python 3
-
-cd search-engine-web-app
+python -V          # make sure it is Python 3
 python web_app.py
 ```
-The above will start a web server with the application:
-```
- * Serving Flask app 'web-app' (lazy loading)
- * Environment: production
-   WARNING: This is a development server. Do not use it in a production deployment.
-   Use a production WSGI server instead.
- * Debug mode: off
- * Running on http://127.0.0.1:8088/ (Press CTRL+C to quit)
-```
 
-Open Web app in your Browser:  
-[http://127.0.0.1:8088/](http://127.0.0.1:8088/) or [http://localhost:8088/](http://localhost:8088/)
+Then open [http://127.0.0.1:8088/](http://127.0.0.1:8088/) in the browser.
 
+---- 
+## Attribution
 
-## Creating your own GitHub repo
-After creating the project and code in local computer...
-
-1. Login to GitHub and create a new repo.
-2. Go to the root page of your new repo and note the url from the browser.
-3. Execute the following locally:
-```bash
-cd <project root folder>
-git init -b main
-git add . && git commit -m "initial commit"
-git remote add origin <your GitHub repo URL from the browser>
-git push -u origin main
-```
-
-## Usage: 
-0. Put the data file `fashion_products_dataset.json` in the `data` folder. It will be provided to you by the instructor.
-1. As for Parts 1, 2, and 3 of the project, please use the `project_progress` folder to store your solutions. Each part should contain `.pdf` file with your report and `.ipynb` (Jupyter Notebook) file with your code for solution and `README.md` with explanation of the content and instructions for results reproduction.
-2. For the Part 4, of the project, you should build a web application using Flask that allows users to search through a collection of documents and view analytics about their searches. You should work mailnly in the `web_app.py` file `myapp` and `templates` folders. Feel free to change any code or add new files as needed. The provided code is just a starting point to help you get started quickly.
-3. Make sure to update the `.env` file with your Groq API key (can be found [here](https://groq.com/), the free version is more than enough for our purposes) and any other necessary configurations. IMPORTANT: Do not share your `.env` file publicly as it contains sensitive information. It is included in `.gitignore` to prevent accidental commits. (It should never be included in the repos and appear here only for demonstration purposes).
-4. Have fun and be creative!
-
-## Attribution:
-The project is adapted from the following sources:
-- [IRWA Template 2021](https://github.com/irwa-labs/search-engine-web-app)
+The project starts from the course template
+[trokhymovych/irwa-search-engine](https://github.com/trokhymovych/irwa-search-engine),
+which is adapted from [IRWA Template 2021](https://github.com/irwa-labs/search-engine-web-app).
