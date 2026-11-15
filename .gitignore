@@ -137,3 +137,4 @@ dmypy.json
 irwa_env/
 data/
 /project_progress/part_2/report_figures
+project_progress/part_1/01_data_preparation.ipynb
