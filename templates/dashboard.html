@@ -1,31 +1,733 @@
 {% extends "base.html" %}
-{% block page_title %}{{ page_title }}{% endblock %}
 
 {% block header %}
-    <!-- Next tag loads Charts.js https://www.chartjs.org/docs/latest/ -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.2/chart.min.js"
-            integrity="sha512-tMabqarPtykgDtdtSqCL3uLVM0gS1ZkUAVhRFu1vSEFgvB73niFQWJuvviDyBGBH22Lcau4rHB5p2K2T0Xvr6Q=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.6.2/dist/chart.min.js"></script>
+
+<style>
+    .analytics-dashboard {
+        margin-top: 20px;
+        margin-bottom: 30px;
+    }
+
+    .section-heading {
+        font-size: 20px;
+        font-weight: 600;
+        margin-top: 30px;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .kpi-card {
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-top: 3px solid #cc0033;
+        border-radius: 6px;
+        padding: 16px 10px;
+        text-align: center;
+        height: 100%;
+    }
+
+    .kpi-label {
+        font-size: 12px;
+        color: #6c757d;
+        margin-bottom: 8px;
+    }
+
+    .kpi-value {
+        font-size: 25px;
+        font-weight: 700;
+        color: #343a40;
+        margin-bottom: 5px;
+    }
+
+    .kpi-description {
+        font-size: 11px;
+        color: #6c757d;
+    }
+
+    .chart-card {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        padding: 16px;
+        height: 100%;
+    }
+
+    .chart-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 5px;
+    }
+
+    .chart-description {
+        font-size: 12px;
+        color: #6c757d;
+        margin-bottom: 15px;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 250px;
+        width: 100%;
+    }
+
+    .large-chart {
+        height: 320px;
+    }
+
+    .empty-chart {
+        color: #6c757d;
+        font-size: 14px;
+        text-align: center;
+        padding-top: 80px;
+    }
+
+    .dashboard-note {
+        font-size: 12px;
+        color: #6c757d;
+    }
+</style>
+
 {% endblock %}
+
 
 {% block content %}
 
-    <!--
-    Examples of what to show in Dashboard:
+<div class="analytics-dashboard">
 
-    - Ranking of visited documents (from results page)
-    - Visitor's preferred browsers
-    - Visitor's city (from IP)
-    - preferred queries ranking
-    - preferred terms
-    - etc.
+    <h3>Analytics Dashboard</h3>
 
-    -->
+    <p class="text-muted">
+        Search performance, user behaviour and product engagement.
+    </p>
 
-    <h3>Dashboard</h3>
-    <iframe src="/plot_number_of_views" width="600" height="400" style="border: none;"></iframe>
+    <div class="alert alert-light border dashboard-note">
+        Statistics are collected from real user interactions
+        since the last application restart.
 
+        <a href="/dashboard" class="float-right">
+            Refresh dashboard
+        </a>
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- OVERVIEW -->
+    <!-- ========================= -->
+
+    <h4 class="section-heading">Overview</h4>
+
+    <div class="row">
+
+        <div class="col-6 col-md-3 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Sessions</div>
+                <div class="kpi-value">
+                    {{ summary.total_sessions }}
+                </div>
+                <div class="kpi-description">
+                    Recorded browsing sessions
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Searches</div>
+                <div class="kpi-value">
+                    {{ summary.total_searches }}
+                </div>
+                <div class="kpi-description">
+                    Completed search queries
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Product Clicks</div>
+                <div class="kpi-value">
+                    {{ summary.total_clicks }}
+                </div>
+                <div class="kpi-description">
+                    Product details visits
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Search CTR</div>
+                <div class="kpi-value">
+                    {{ summary.ctr }}%
+                </div>
+                <div class="kpi-description">
+                    Searches with at least one click
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- SEARCH PERFORMANCE -->
+    <!-- ========================= -->
+
+    <h4 class="section-heading">Search Performance</h4>
+
+    <div class="row">
+
+        <div class="col-6 col-md-3 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Zero-result Rate</div>
+                <div class="kpi-value">
+                    {{ summary.zero_result_rate }}%
+                </div>
+                <div class="kpi-description">
+                    Searches without results
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Average Query Length</div>
+                <div class="kpi-value">
+                    {{ summary.avg_query_length }}
+                </div>
+                <div class="kpi-description">
+                    Terms per query
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Average Results</div>
+                <div class="kpi-value">
+                    {{ summary.avg_results }}
+                </div>
+                <div class="kpi-description">
+                    Products per search
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Retrieval Time</div>
+                <div class="kpi-value">
+                    {{ summary.avg_retrieval_time }}
+                </div>
+                <div class="kpi-description">
+                    Average milliseconds, excluding RAG
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- QUERY ANALYSIS -->
+    <!-- ========================= -->
+
+    <h4 class="section-heading">Query Analysis</h4>
+
+    <div class="row">
+
+        <div class="col-md-6 mb-3">
+            <div class="chart-card">
+
+                <div class="chart-title">
+                    Most Frequent Queries
+                </div>
+
+                <div class="chart-description">
+                    Identifies the most popular search requests.
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="queriesChart"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="chart-card">
+
+                <div class="chart-title">
+                    Most Frequent Terms
+                </div>
+
+                <div class="chart-description">
+                    Shows the words users search for most often.
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="termsChart"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-12 mb-3">
+            <div class="chart-card">
+
+                <div class="chart-title">
+                    Search Activity by Hour
+                </div>
+
+                <div class="chart-description">
+                    Reveals the hours with the highest search activity
+                    using the server's local time.
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="hoursChart"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- USER ENGAGEMENT -->
+    <!-- ========================= -->
+
+    <h4 class="section-heading">User Engagement</h4>
+
+    <div class="row">
+
+        <div class="col-6 col-md-4 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Average Clicked Rank</div>
+
+                <div class="kpi-value">
+                    {% if summary.total_clicks %}
+                        {{ summary.avg_clicked_rank }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </div>
+
+                <div class="kpi-description">
+                    Position of clicked results
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">Average Dwell Time</div>
+
+                <div class="kpi-value">
+                    {% if summary.measured_dwell_times %}
+                        {{ summary.avg_dwell_time }} s
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </div>
+
+                <div class="kpi-description">
+                    Time before returning to results
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-4 mb-3">
+            <div class="kpi-card">
+                <div class="kpi-label">HTTP Requests</div>
+                <div class="kpi-value">
+                    {{ summary.total_requests }}
+                </div>
+                <div class="kpi-description">
+                    Tracked application requests
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <p class="dashboard-note">
+        Dwell time is calculated from
+        {{ summary.measured_dwell_times }}
+        recorded returns to search results.
+    </p>
+
+    <div class="row">
+
+        <div class="col-12 mb-3">
+            <div class="chart-card">
+
+                <div class="chart-title">
+                    Clicks by Result Rank
+                </div>
+
+                <div class="chart-description">
+                    Shows which ranking positions attract the most clicks.
+                    Higher engagement with top-ranked results may indicate
+                    effective ranking, although position bias also matters.
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="ranksChart"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-12 mb-3">
+            <div class="chart-card">
+
+                <div class="chart-title">
+                    Most Viewed Products
+                </div>
+
+                <div class="chart-description">
+                    Identifies products receiving the most visits
+                    to their details pages.
+                </div>
+
+                <div class="chart-container large-chart">
+                    <canvas id="productsChart"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- VISITOR CHARACTERISTICS -->
+    <!-- ========================= -->
+
+    <h4 class="section-heading">Visitor Characteristics</h4>
+
+    <div class="row">
+
+        <div class="col-md-6 mb-3">
+            <div class="chart-card">
+
+                <div class="chart-title">
+                    Browser Distribution
+                </div>
+
+                <div class="chart-description">
+                    Browsers used to access the search engine.
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="browsersChart"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="chart-card">
+
+                <div class="chart-title">
+                    Operating Systems
+                </div>
+
+                <div class="chart-description">
+                    Operating systems detected from user agents.
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="osChart"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="chart-card">
+
+                <div class="chart-title">
+                    Device Distribution
+                </div>
+
+                <div class="chart-description">
+                    Distribution of desktop and mobile sessions.
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="devicesChart"></canvas>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Pass Python data to JavaScript -->
+
+<div id="analytics-data"
+     data-charts='{{ chart_data | tojson }}'
+     hidden>
+</div>
+
+
+<script>
+
+    const chartData = JSON.parse(
+        document.getElementById("analytics-data").dataset.charts
+    );
+
+    const colors = [
+        "#cc0033",
+        "#5470c6",
+        "#91cc75",
+        "#fac858",
+        "#73c0de",
+        "#9a60b4",
+        "#6c757d",
+        "#ee6666"
+    ];
+
+
+    // Display a message when no data has been collected.
+
+    function showEmptyChart(canvasId) {
+
+        const canvas = document.getElementById(canvasId);
+
+        canvas.style.display = "none";
+
+        const message = document.createElement("div");
+
+        message.className = "empty-chart";
+
+        message.textContent = "No data collected yet.";
+
+        canvas.parentElement.appendChild(message);
+    }
+
+
+    // Reusable bar chart function.
+
+    function createBarChart(
+        canvasId,
+        data,
+        label,
+        horizontal = false
+    ) {
+
+        if (!data.length) {
+            showEmptyChart(canvasId);
+            return;
+        }
+
+        new Chart(
+            document.getElementById(canvasId),
+            {
+                type: "bar",
+
+                data: {
+                    labels: data.map(item => item[0]),
+
+                    datasets: [{
+                        label: label,
+                        data: data.map(item => item[1]),
+                        backgroundColor: "#cc0033",
+                        borderRadius: 4
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    indexAxis: horizontal ? "y" : "x",
+
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+
+                    scales: horizontal
+                        ? {
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        }
+                        : {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        }
+                }
+            }
+        );
+    }
+
+
+    // Reusable doughnut chart function.
+
+    function createDoughnutChart(canvasId, data) {
+
+        if (!data.length) {
+            showEmptyChart(canvasId);
+            return;
+        }
+
+        new Chart(
+            document.getElementById(canvasId),
+            {
+                type: "doughnut",
+
+                data: {
+                    labels: data.map(item => item[0]),
+
+                    datasets: [{
+                        data: data.map(item => item[1]),
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: "#ffffff"
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            position: "bottom"
+                        }
+                    }
+                }
+            }
+        );
+    }
+
+
+    // Most frequent queries.
+
+    createBarChart(
+        "queriesChart",
+        chartData.queries,
+        "Searches",
+        true
+    );
+
+
+    // Most frequent terms.
+
+    createBarChart(
+        "termsChart",
+        chartData.terms,
+        "Occurrences",
+        true
+    );
+
+
+    // Clicks by ranking position.
+
+    createBarChart(
+        "ranksChart",
+        chartData.ranks,
+        "Clicks"
+    );
+
+
+    // Most viewed products.
+
+    createBarChart(
+        "productsChart",
+        chartData.products,
+        "Views",
+        true
+    );
+
+
+    // Visitor characteristics.
+
+    createDoughnutChart(
+        "browsersChart",
+        chartData.browsers
+    );
+
+    createDoughnutChart(
+        "osChart",
+        chartData.operating_systems
+    );
+
+    createDoughnutChart(
+        "devicesChart",
+        chartData.devices
+    );
+
+
+    // Hourly search activity.
+
+    new Chart(
+        document.getElementById("hoursChart"),
+        {
+            type: "line",
+
+            data: {
+                labels: chartData.hours.map(
+                    item => String(item[0]).padStart(2, "0") + ":00"
+                ),
+
+                datasets: [{
+                    label: "Searches",
+
+                    data: chartData.hours.map(
+                        item => item[1]
+                    ),
+
+                    borderColor: "#cc0033",
+                    backgroundColor: "rgba(204, 0, 51, 0.1)",
+
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        }
+    );
+
+</script>
 
 {% endblock %}
-
-

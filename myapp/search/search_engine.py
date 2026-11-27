@@ -1,12 +1,12 @@
+from urllib.parse import urlencode
 from myapp.search.algorithms import OurScoreSearch
-from myapp.search.objects import Document
+from myapp.search.objects import ResultItem
 
 
 class SearchEngine:
     """Class that implements the search engine logic"""
 
     def __init__(self, corpus):
-        # inverted index and everything our score needs, built once when the app starts
         print("Building the inverted index...")
         self.searcher = OurScoreSearch(corpus)
         print("Index ready")
@@ -14,10 +14,30 @@ class SearchEngine:
     def search(self, search_query, search_id, corpus):
         print("Search query:", search_query)
 
-        # AND search + our score (Part 3)
         results = []
-        for pid, score in self.searcher.search(search_query):
+
+        ranked_products = self.searcher.search(search_query)
+
+        for rank, (pid, score) in enumerate(
+            ranked_products,
+            start=1
+        ):
             doc = corpus[pid]
-            results.append(Document(pid=doc.pid, title=doc.title, description=doc.description,
-                                    url="doc_details?pid={}&search_id={}".format(doc.pid, search_id), ranking=score))
+
+            params = urlencode({
+                "pid": pid,
+                "search_id": search_id,
+                "rank": rank
+            })
+
+            result = ResultItem(
+                **doc.model_dump(),
+                ranking=score,
+                rank=rank,
+                search_id=search_id,
+                details_url=f"/doc_details?{params}"
+            )
+
+            results.append(result)
+
         return results

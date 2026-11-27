@@ -1,27 +1,183 @@
 {% extends "base.html" %}
 {% block page_title %}{{ page_title }}{% endblock %}
 {% block content %}
-    Found <strong>{{ found_counter }}</strong> results...
-    <hr>
+
+    <p>
+        Found <strong>{{ found_counter }}</strong> results.
+    </p>
+
     {% if rag_response %}
-        <div class="mb-4 p-3" style="border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;">
-            <h5>AI-Generated Summary:</h5>
-            <p>{{ rag_response }}</p>
+        <div class="mb-4 p-3 border rounded bg-light">
+            <h5>AI-Generated Summary</h5>
+
+            <div style="white-space: pre-line;">
+                {{ rag_response }}
+            </div>
         </div>
     {% endif %}
-    <hr>
-    {% for item in results_list %}
-        <div class="pb-3">
-            <div class="doc-title">
-                <a href="{{ item.url }}">{{ item.title }}...
-                </a>
-            </div>
-            <div class="doc-desc">
-                {{ item.doc_date }} — {{ item.description }}
-            </div>
 
+    {% for item in results_list %}
+
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="row">
+
+                    {% if item.images %}
+                        <div class="col-md-2 text-center">
+                            <img
+                                src="{{ item.images[0] }}"
+                                alt="{{ item.title }}"
+                                class="img-fluid"
+                                loading="lazy"
+                                style="max-height: 150px;"
+                            >
+                        </div>
+                    {% endif %}
+
+                    <div class="col">
+
+                        <small class="text-muted">
+                            Result #{{ item.rank }}
+                        </small>
+
+                        <h5>
+                            <a href="{{ item.details_url }}">
+                                {{ item.title }}
+                            </a>
+                        </h5>
+
+                        {% if item.brand %}
+                            <p class="text-muted mb-2">
+                                {{ item.brand }}
+                            </p>
+                        {% endif %}
+
+                        <p>
+                            {{ item.description or
+                               "No description available." }}
+                        </p>
+
+                        <div class="mb-2">
+
+                            {% if item.selling_price is not none %}
+                                <strong>
+                                    ₹{{ "%.2f"|format(item.selling_price) }}
+                                </strong>
+                            {% else %}
+                                Price unavailable
+                            {% endif %}
+
+                            {% if item.actual_price is not none %}
+                                <del class="text-muted ml-2">
+                                    ₹{{ "%.2f"|format(item.actual_price) }}
+                                </del>
+                            {% endif %}
+
+                            {% if item.discount is not none %}
+                                <span class="text-success ml-2">
+                                    {{ item.discount }}% off
+                                </span>
+                            {% endif %}
+
+                        </div>
+
+                        <p>
+                            {% if item.average_rating is not none %}
+                                <span class="badge badge-success">
+                                    ★ {{ item.average_rating }}/5
+                                </span>
+                            {% else %}
+                                <span class="text-muted">
+                                    No rating
+                                </span>
+                            {% endif %}
+
+                            {% if item.out_of_stock %}
+                                <span class="badge badge-danger">
+                                    Out of stock
+                                </span>
+                            {% else %}
+                                <span class="badge badge-secondary">
+                                    In stock
+                                </span>
+                            {% endif %}
+                        </p>
+
+                        <a
+                            href="{{ item.details_url }}"
+                            class="btn btn-primary btn-sm"
+                        >
+                            View details
+                        </a>
+
+                        {% if item.url %}
+                            <a
+                                href="{{ item.url }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="btn btn-outline-secondary btn-sm"
+                            >
+                                Original website
+                            </a>
+                        {% endif %}
+
+                    </div>
+                </div>
+            </div>
         </div>
 
-    {% endfor %}
-{% endblock %}
+    {% else %}
 
+        <div class="alert alert-info">
+            No products match your query.
+            Try using different search terms.
+        </div>
+    {% endfor %}
+    <div id="search-tracking"
+        data-search-id="{{ search_id }}"
+        hidden>
+    </div>
+
+    <script>
+        window.addEventListener("pageshow", function () {
+
+            const storedClick = sessionStorage.getItem(
+                "pendingProductClick"
+            );
+
+            if (!storedClick) {
+                return;
+            }
+
+            const click = JSON.parse(storedClick);
+
+            const currentSearchId = Number(
+                document.getElementById("search-tracking")
+                    .dataset.searchId
+            );
+
+            if (click.search_id !== currentSearchId) {
+                return;
+            }
+
+            fetch("/track_return", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    click_id: click.click_id
+                }),
+                keepalive: true
+            }).then(function (response) {
+
+                if (response.ok) {
+                    sessionStorage.removeItem(
+                        "pendingProductClick"
+                    );
+                }
+
+            });
+        });
+    </script>
+{% endblock %}

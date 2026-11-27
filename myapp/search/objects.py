@@ -97,12 +97,11 @@ class StatsDocument(BaseModel):
         return self.model_dump_json()
 
 
-class ResultItem(BaseModel):
-    pid: str
-    title: str
-    description: Optional[str] = None
-    url: Optional[str] = None
+class ResultItem(Document):
     ranking: Optional[float] = None
+    rank: Optional[int] = None
+    details_url: Optional[str] = None
+    search_id: Optional[int] = None
 
     def __str__(self) -> str:
         return self.model_dump_json(indent=2)
